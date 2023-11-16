@@ -1,10 +1,10 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
+
 class ThreadManager {
-    private List<JavaCommand> commandQueue;
+    private final List<JavaCommand> commandQueue;
     private Thread currentThread;
     private Boolean alive;
 
@@ -28,6 +28,14 @@ class ThreadManager {
     private void executeCommands() {
         while (alive) {
             executeCommand();
+            
+            try {
+            TimeUnit.SECONDS.sleep(5);
+
+        } catch (InterruptedException e) {
+            currentThread.interrupt();
+
+        }
         }
     }
 
@@ -40,23 +48,17 @@ class ThreadManager {
         if(commandQueue.isEmpty()) {
             return;
         }
-
-
+        
+        int size = commandQueue.size() - 1;        
+        
         if (currentThread != null) {
             currentThread.interrupt();
         }
 
-        currentThread = new Thread(commandQueue.get(0));
-        commandQueue.remove(0);
+        currentThread = new Thread(commandQueue.get(size));
+        commandQueue.clear();
+       
         currentThread.start();
-
-        try {
-            TimeUnit.SECONDS.sleep(1);
-
-        } catch (InterruptedException e) {
-            currentThread.interrupt();
-
-        }
 
     }
 
